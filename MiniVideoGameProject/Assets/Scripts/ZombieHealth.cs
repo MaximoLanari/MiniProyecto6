@@ -63,18 +63,28 @@ public class ZombieHealth : MonoBehaviour
             anim.SetTrigger("Die");
         }
 
-        
-        rb.velocity = Vector2.zero; 
-        rb.bodyType = RigidbodyType2D.Kinematic; 
-        rb.simulated = false; 
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            rb.gravityScale = 1f;
+            rb.simulated = true;
 
-       
-        foreach (Collider2D col in colliders)
+            StartCoroutine(WaitToFreezeOnGround());
+        }
+
+
+
+
+        Collider2D[] allCols = GetComponentsInChildren<Collider2D>(includeInactive: true);
+
+        foreach (Collider2D col in allCols)
         {
             col.enabled = false;
         }
 
-        
+
         foreach (MonoBehaviour component in GetComponents<MonoBehaviour>())
         {
             if (component != this && component != anim)
@@ -90,11 +100,42 @@ public class ZombieHealth : MonoBehaviour
             zombieAudio.Stop();
             if (deathSound != null)
             {
-                // Play death sound once
+                
                 zombieAudio.PlayOneShot(deathSound); 
             }
         }
     }
+
+    private IEnumerator WaitToFreezeOnGround()
+    {
+       
+        while (!IsTouchingGround())
+        {
+            yield return null;
+        }
+
+       
+
+        if (rb != null)
+        {
+            rb.constraints = RigidbodyConstraints2D.FreezeAll;
+        }
+
+        Collider2D[] allCols = GetComponentsInChildren<Collider2D>(includeInactive: true);
+        foreach (Collider2D col in allCols)
+        {
+            col.enabled = false;
+        }
+
+        
+    }
+
+    private bool IsTouchingGround()
+    {
+        
+        return Physics2D.Raycast(transform.position, Vector2.down, 0.1f, LayerMask.GetMask("Ground"));
+    }
+
 
     void OnTriggerEnter2D(Collider2D other)
     {

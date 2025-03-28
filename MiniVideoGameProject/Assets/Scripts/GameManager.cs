@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
     public GameObject restartButton_Pause;
     private bool isPaused = false;
 
+    public AudioSource audioSource; 
+    public AudioClip clickSound;
+
     void Start()
     {
        
@@ -77,6 +80,12 @@ public class GameManager : MonoBehaviour
    
     public void RestartGame()
     {
+
+        if (audioSource != null && clickSound != null)
+        {
+            audioSource.PlayOneShot(clickSound);
+        }
+
         Time.timeScale = 1f; 
         SceneManager.LoadScene(SceneManager.GetActiveScene().name); 
     }

@@ -1,29 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class WinZone : MonoBehaviour
 {
-    public GameObject winMessage; 
+    public GameObject winMessage;      
+    public AudioClip victorySound;     
+    private AudioSource audioSource;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (winMessage != null)
+        {
+            winMessage.SetActive(false); 
+        }
+    }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log(" Player has won the game!");
-            ShowWinMessage();
-            StopGame();
-        }
-    }
+           
+            if (winMessage != null)
+            {
+                winMessage.SetActive(true);
+            }
 
-    void ShowWinMessage()
-    {
-        if (winMessage != null)
-        {
-            winMessage.SetActive(true);
-            
+            if (victorySound != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(victorySound);
+            }
+
+            Time.timeScale = 0f; 
         }
-        
     }
 
     void StopGame()
